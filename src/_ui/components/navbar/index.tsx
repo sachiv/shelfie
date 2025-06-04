@@ -1,7 +1,5 @@
-import { Button } from "@/_ui/shadcn/button";
 import ThemeToggle from "../ThemeToggle";
 import { Logo } from "./Logo";
-import { NavMenu } from "./NavMenu";
 import { NavigationSheet } from "./NavigationSheet";
 
 const Navbar = () => {
@@ -11,14 +9,14 @@ const Navbar = () => {
         <Logo />
 
         {/* Desktop Menu */}
-        <NavMenu className="hidden md:block" />
+        {/* <NavMenu className="hidden md:block" /> */}
 
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          <Button variant="outline" className="hidden sm:inline-flex">
+          {/* <Button variant="outline" className="hidden sm:inline-flex">
             Sign In
-          </Button>
-          <Button className="hidden xs:inline-flex">Get Started</Button>
+          </Button> */}
+          {/* <Button className="hidden xs:inline-flex">Get Started</Button> */}
 
           {/* Mobile Menu */}
           <div className="md:hidden">
