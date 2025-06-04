@@ -1,3 +1,5 @@
+"use server";
+
 import sequelize from "@/db_connection";
 import { DataTypes, Model } from "sequelize";
 
@@ -11,7 +13,7 @@ class Author extends Model {
 Author.init(
   {
     id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },

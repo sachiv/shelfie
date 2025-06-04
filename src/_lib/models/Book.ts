@@ -1,3 +1,5 @@
+"use server";
+
 import sequelize from "@/db_connection";
 import { DataTypes, Model } from "sequelize";
 import Author from "./Author";
@@ -7,13 +9,13 @@ class Book extends Model {
   public title!: string;
   public description!: string;
   public published_date!: Date;
-  public author!: Author;
+  public author_id!: number;
 }
 
 Book.init(
   {
     id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
@@ -28,7 +30,7 @@ Book.init(
       type: new DataTypes.DATE(),
     },
     author_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: Author,
