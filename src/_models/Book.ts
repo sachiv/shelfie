@@ -1,0 +1,54 @@
+import sequelize from "@/db_connection";
+import { DataTypes, Model } from "sequelize";
+import Author from "./Author";
+
+class Book extends Model {
+  public id!: number;
+  public title!: string;
+  public description!: string;
+  public published_date!: Date;
+  public author!: Author;
+}
+
+Book.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    title: {
+      type: new DataTypes.STRING(),
+      allowNull: false,
+    },
+    description: {
+      type: new DataTypes.TEXT(),
+    },
+    published_date: {
+      type: new DataTypes.DATE(),
+    },
+    author_id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      references: {
+        model: Author,
+        key: "id",
+      },
+    },
+  },
+  {
+    sequelize,
+    tableName: "books",
+    createdAt: "created_at",
+    updatedAt: "updated_at",
+    underscored: true,
+    indexes: [
+      {
+        unique: true,
+        fields: ["author_id"],
+      },
+    ],
+  }
+);
+
+export default Book;
