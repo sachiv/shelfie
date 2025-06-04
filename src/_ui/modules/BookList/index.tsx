@@ -24,10 +24,11 @@ import { useState } from "react";
 import { AddAuthorForm } from "./AddAuthorForm";
 import { AddBookForm } from "./AddBookForm";
 import { BookCard } from "./BookCard";
+import { BookFilters } from "./BookFilters";
 
 const GET_BOOKS = gql`
-  query GetBooks($page: Int, $limit: Int) {
-    books(page: $page, limit: $limit) {
+  query GetBooks($page: Int, $limit: Int, $search: String) {
+    books(page: $page, limit: $limit, search: $search) {
       books {
         id
         title
@@ -99,6 +100,7 @@ export default function BooksList() {
   const [isAuthorDialogOpen, setIsAuthorDialogOpen] = useState(false);
   const [isBookDialogOpen, setIsBookDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [filters, setFilters] = useState({ search: "" });
 
   const {
     data: booksData,
@@ -106,7 +108,7 @@ export default function BooksList() {
     error: booksError,
     refetch: refetchBooks,
   } = useQuery(GET_BOOKS, {
-    variables: { page, limit: PAGE_SIZE },
+    variables: { page, limit: PAGE_SIZE, search: filters.search },
   });
 
   const { data: authorsData, refetch: refetchAuthors } = useQuery(GET_AUTHORS);
@@ -170,7 +172,7 @@ export default function BooksList() {
         },
       });
       setPage(1);
-      await refetchBooks({ page: 1, limit: PAGE_SIZE });
+      await refetchBooks({ page: 1, limit: PAGE_SIZE, search: filters.search });
       setIsBookDialogOpen(false);
     } catch (error) {
       console.error("Error creating book:", error);
@@ -179,45 +181,61 @@ export default function BooksList() {
     }
   };
 
-  return (
-    <div className="space-y-6 flex-1 justify-between flex flex-col py-10">
-      <div className="flex justify-end gap-4 mb-4">
-        <Dialog open={isAuthorDialogOpen} onOpenChange={setIsAuthorDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline">
-              <PlusIcon className="mr-2 h-4 w-4" />
-              Add Author
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Author</DialogTitle>
-            </DialogHeader>
-            <AddAuthorForm
-              onSubmit={handleAddAuthor}
-              isLoading={isSubmitting}
-            />
-          </DialogContent>
-        </Dialog>
+  const handleFilterChange = (newFilters: { search: string }) => {
+    setFilters(newFilters);
+    setPage(1); // Reset to first page when filters change
+    refetchBooks({ page: 1, limit: PAGE_SIZE, search: newFilters.search });
+  };
 
-        <Dialog open={isBookDialogOpen} onOpenChange={setIsBookDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusIcon className="mr-2 h-4 w-4" />
-              Add Book
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Book</DialogTitle>
-            </DialogHeader>
-            <AddBookForm
-              onSubmit={handleAddBook}
-              isLoading={isSubmitting}
-              authors={authorsData?.authors || []}
-            />
-          </DialogContent>
-        </Dialog>
+  return (
+    <div className="space-y-6 flex-1 flex flex-col py-10">
+      <div className="flex justify-between items-start gap-4 mb-4">
+        <div className="flex gap-4">
+          <Dialog
+            open={isAuthorDialogOpen}
+            onOpenChange={setIsAuthorDialogOpen}
+          >
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <PlusIcon className="mr-2 h-4 w-4" />
+                Add Author
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Author</DialogTitle>
+              </DialogHeader>
+              <AddAuthorForm
+                onSubmit={handleAddAuthor}
+                isLoading={isSubmitting}
+              />
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={isBookDialogOpen} onOpenChange={setIsBookDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <PlusIcon className="mr-2 h-4 w-4" />
+                Add Book
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Book</DialogTitle>
+              </DialogHeader>
+              <AddBookForm
+                onSubmit={handleAddBook}
+                isLoading={isSubmitting}
+                authors={authorsData?.authors || []}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        <BookFilters
+          onFilterChange={handleFilterChange}
+          activeFilters={filters}
+        />
       </div>
 
       <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

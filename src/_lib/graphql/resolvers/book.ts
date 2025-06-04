@@ -1,5 +1,6 @@
 import Author from "@/_lib/models/Author";
 import Book from "@/_lib/models/Book";
+import { Op } from "sequelize";
 
 // Add this type above the resolvers object
 type BookInput = {
@@ -12,18 +13,32 @@ type BookInput = {
 
 const resolvers = {
   Query: {
-    books: async (_: unknown, args: { page?: number; limit?: number }) => {
+    books: async (
+      _: unknown,
+      args: { page?: number; limit?: number; search?: string }
+    ) => {
       const page = args.page || 1;
       const limit = args.limit || 10;
       const offset = (page - 1) * limit;
+
+      const whereClause = args.search
+        ? {
+            [Op.or]: [
+              { title: { [Op.iLike]: `%${args.search}%` } },
+              { "$author.name$": { [Op.iLike]: `%${args.search}%` } },
+            ],
+          }
+        : {};
 
       const { count, rows } = await Book.findAndCountAll({
         include: [
           {
             model: Author,
             as: "author",
+            required: args.search ? true : false, // Only require author join if searching
           },
         ],
+        where: whereClause,
         limit,
         offset,
         order: [["created_at", "DESC"]],
