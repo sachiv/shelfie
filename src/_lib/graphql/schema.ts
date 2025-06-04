@@ -19,10 +19,34 @@ export const typeDefs = gql`
     # books: [Book!]
   }
 
+  input BookInput {
+    id: Int
+    title: String!
+    description: String
+    published_date: String
+    author_id: Int!
+  }
+
+  input AuthorInput {
+    id: Int
+    name: String!
+    biography: String
+    born_date: String
+  }
+
   type Query {
     books: [Book!]!
     book(id: Int!): Book
     authors: [Author!]!
     author(id: Int!): Author
+  }
+
+  type Mutation {
+    createBook(book: BookInput!): Book!
+    updateBook(book: BookInput!): Book!
+    deleteBook(id: Int!): Book!
+    createAuthor(author: AuthorInput!): Author!
+    updateAuthor(author: AuthorInput!): Author!
+    deleteAuthor(id: Int!): Author!
   }
 `;
