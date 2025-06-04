@@ -1,3 +1,4 @@
+import Author from "@/_lib/models/Author";
 import Book from "@/_lib/models/Book";
 
 // Add this type above the resolvers object
@@ -11,9 +12,30 @@ type BookInput = {
 
 const resolvers = {
   Query: {
-    books: async () => await Book.findAll(),
+    books: async () =>
+      await Book.findAll({
+        include: [
+          {
+            model: Author,
+            as: "author",
+          },
+        ],
+      }),
     book: async (_: unknown, args: { id: number }) =>
-      await Book.findByPk(args.id),
+      await Book.findByPk(args.id, {
+        include: [
+          {
+            model: Author,
+            as: "author",
+          },
+        ],
+      }),
+  },
+
+  Book: {
+    author: async (book: Book) => {
+      return await Author.findByPk(book.author_id);
+    },
   },
 
   Mutation: {

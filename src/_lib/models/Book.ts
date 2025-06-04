@@ -2,7 +2,6 @@
 
 import sequelize from "@/db_connection";
 import { DataTypes, Model } from "sequelize";
-import Author from "./Author";
 
 class Book extends Model {
   public id!: number;
@@ -10,6 +9,10 @@ class Book extends Model {
   public description!: string;
   public published_date!: Date;
   public author_id!: number;
+  public author?: {
+    id: number;
+    name: string;
+  };
 }
 
 Book.init(
@@ -32,10 +35,6 @@ Book.init(
     author_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: Author,
-        key: "id",
-      },
     },
   },
   {
@@ -44,12 +43,6 @@ Book.init(
     createdAt: "created_at",
     updatedAt: "updated_at",
     underscored: true,
-    indexes: [
-      {
-        unique: true,
-        fields: ["author_id"],
-      },
-    ],
   }
 );
 

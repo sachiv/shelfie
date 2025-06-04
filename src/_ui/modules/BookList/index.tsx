@@ -13,6 +13,10 @@ const GET_BOOKS = gql`
       description
       published_date
       author_id
+      author {
+        id
+        name
+      }
     }
   }
 `;

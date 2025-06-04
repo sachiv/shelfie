@@ -7,6 +7,7 @@ const book = gql`
     description: String
     published_date: String
     author_id: Int!
+    author: Author
   }
 
   input BookInput {

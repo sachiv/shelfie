@@ -16,6 +16,9 @@ export const BookCard = ({ book }: { book: Book }) => {
         <CardDescription className="line-clamp-3">
           {book.description}
         </CardDescription>
+        <p className="text-sm text-muted-foreground mt-2">
+          By {book.author?.name || "Unknown Author"}
+        </p>
       </CardHeader>
       <CardFooter className="mt-auto">
         <Button variant="outline" className="w-full">
