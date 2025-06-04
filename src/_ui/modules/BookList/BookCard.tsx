@@ -10,13 +10,17 @@ import {
 
 export const BookCard = ({ book }: { book: Book }) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{book.title}</CardTitle>
-        <CardDescription>{book.description}</CardDescription>
+    <Card className="h-full flex flex-col">
+      <CardHeader className="flex-grow">
+        <CardTitle className="line-clamp-2">{book.title}</CardTitle>
+        <CardDescription className="line-clamp-3">
+          {book.description}
+        </CardDescription>
       </CardHeader>
-      <CardFooter>
-        <Button variant="outline">View Details</Button>
+      <CardFooter className="mt-auto">
+        <Button variant="outline" className="w-full">
+          View Details
+        </Button>
       </CardFooter>
     </Card>
   );
