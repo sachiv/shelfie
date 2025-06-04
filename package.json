@@ -10,12 +10,18 @@
     "migration:create": "dotenv -- sequelize-cli migration:create",
     "migrate": "dotenv -- sequelize-cli db:migrate",
     "migration:rollback": "dotenv -- sequelize-cli db:migrate:undo",
-    "migration:rollback:all": "dotenv -- sequelize-cli db:migrate:undo:all"
+    "migration:rollback:all": "dotenv -- sequelize-cli db:migrate:undo:all",
+    "migration:seed": "dotenv -- sequelize-cli db:seed:all",
+    "migration:seed:undo": "dotenv -- sequelize-cli db:seed:undo:all",
+    "migration:reseed": "dotenv -- sequelize-cli db:drop && dotenv -- sequelize-cli db:create && dotenv -- sequelize-cli db:migrate && dotenv -- sequelize-cli db:seed:all"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
     "@apollo/server": "^4.12.2",
     "@as-integrations/next": "^3.2.0",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-navigation-menu": "^1.2.13",
+    "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "graphql": "^16.11.0",
@@ -23,6 +29,7 @@
     "lucide-react": "^0.513.0",
     "mongoose": "^8.15.1",
     "next": "15.3.3",
+    "next-themes": "^0.4.6",
     "pg": "^8.16.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
