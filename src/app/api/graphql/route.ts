@@ -7,6 +7,10 @@ import { startServerAndCreateNextHandler } from "@as-integrations/next";
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  formatError: (err) => {
+    console.error("GraphQL Error:", err);
+    return err;
+  },
 });
 
 export const POST = startServerAndCreateNextHandler(server);

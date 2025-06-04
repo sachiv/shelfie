@@ -14,49 +14,64 @@ type BookInput = {
 const resolvers = {
   Query: {
     books: async (
-      _: unknown,
-      args: {
-        page?: number;
-        limit?: number;
+      _: any,
+      {
+        page = 1,
+        limit = 10,
+        search,
+        author_id,
+        published_from,
+        published_to,
+      }: {
+        page: number;
+        limit: number;
         search?: string;
         author_id?: number;
+        published_from?: string;
+        published_to?: string;
       }
     ) => {
-      const page = args.page || 1;
-      const limit = args.limit || 10;
       const offset = (page - 1) * limit;
-
       const whereClause: WhereOptions = {};
 
-      if (args.search) {
+      if (search) {
         whereClause[Op.or] = [
-          { title: { [Op.iLike]: `%${args.search}%` } },
-          { "$author.name$": { [Op.iLike]: `%${args.search}%` } },
+          { title: { [Op.iLike]: `%${search}%` } },
+          { "$author.name$": { [Op.iLike]: `%${search}%` } },
         ];
       }
 
-      if (args.author_id) {
-        whereClause.author_id = args.author_id;
+      if (author_id) {
+        whereClause.author_id = author_id;
       }
 
-      const { count, rows } = await Book.findAndCountAll({
+      if (published_from || published_to) {
+        whereClause.published_date = {};
+        if (published_from) {
+          whereClause.published_date[Op.gte] = new Date(published_from);
+        }
+        if (published_to) {
+          whereClause.published_date[Op.lte] = new Date(published_to);
+        }
+      }
+
+      const { rows: books, count: total } = await Book.findAndCountAll({
+        where: whereClause,
         include: [
           {
             model: Author,
             as: "author",
-            required: args.search ? true : false,
           },
         ],
-        where: whereClause,
         limit,
         offset,
         order: [["created_at", "DESC"]],
       });
 
       return {
-        books: rows,
-        total: count,
-        hasMore: count > page * limit,
+        books,
+        total,
+        hasMore: total > page * limit,
       };
     },
     book: async (_: unknown, args: { id: number }) =>

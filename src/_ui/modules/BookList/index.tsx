@@ -21,14 +21,29 @@ import {
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
+import { DateRange } from "react-day-picker";
 import { AddAuthorForm } from "./AddAuthorForm";
 import { AddBookForm } from "./AddBookForm";
 import { BookCard } from "./BookCard";
 import { BookFilters } from "./BookFilters";
 
 const GET_BOOKS = gql`
-  query GetBooks($page: Int, $limit: Int, $search: String, $author_id: Int) {
-    books(page: $page, limit: $limit, search: $search, author_id: $author_id) {
+  query GetBooks(
+    $page: Int
+    $limit: Int
+    $search: String
+    $author_id: Int
+    $published_from: String
+    $published_to: String
+  ) {
+    books(
+      page: $page
+      limit: $limit
+      search: $search
+      author_id: $author_id
+      published_from: $published_from
+      published_to: $published_to
+    ) {
       books {
         id
         title
@@ -95,10 +110,11 @@ type BookFormValues = {
   author_id: string;
 };
 
-type Filters = {
+interface Filters {
   search: string;
-  author_id: number | undefined;
-};
+  author_id?: number;
+  published_date?: DateRange;
+}
 
 export default function BooksList() {
   const [page, setPage] = useState(1);
@@ -108,6 +124,7 @@ export default function BooksList() {
   const [filters, setFilters] = useState<Filters>({
     search: "",
     author_id: undefined,
+    published_date: undefined,
   });
 
   const {
@@ -119,8 +136,10 @@ export default function BooksList() {
     variables: {
       page,
       limit: PAGE_SIZE,
-      search: filters.search,
+      search: filters.search || undefined,
       author_id: filters.author_id,
+      published_from: filters.published_date?.from?.toISOString(),
+      published_to: filters.published_date?.to?.toISOString(),
     },
   });
 
@@ -188,8 +207,10 @@ export default function BooksList() {
       await refetchBooks({
         page: 1,
         limit: PAGE_SIZE,
-        search: filters.search,
+        search: filters.search || undefined,
         author_id: filters.author_id,
+        published_from: filters.published_date?.from?.toISOString(),
+        published_to: filters.published_date?.to?.toISOString(),
       });
       setIsBookDialogOpen(false);
     } catch (error) {
@@ -199,20 +220,16 @@ export default function BooksList() {
     }
   };
 
-  const handleFilterChange = (newFilters: {
-    search: string;
-    author_id?: number;
-  }) => {
-    setFilters({
-      search: newFilters.search,
-      author_id: newFilters.author_id,
-    });
+  const handleFilterChange = (newFilters: Filters) => {
+    setFilters(newFilters);
     setPage(1); // Reset to first page when filters change
     refetchBooks({
       page: 1,
       limit: PAGE_SIZE,
-      search: newFilters.search,
+      search: newFilters.search || undefined,
       author_id: newFilters.author_id,
+      published_from: newFilters.published_date?.from?.toISOString(),
+      published_to: newFilters.published_date?.to?.toISOString(),
     });
   };
 
