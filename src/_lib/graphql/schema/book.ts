@@ -25,7 +25,12 @@ const book = gql`
   }
 
   extend type Query {
-    books(page: Int = 1, limit: Int = 10, search: String): PaginatedBooks!
+    books(
+      page: Int = 1
+      limit: Int = 10
+      search: String
+      author_id: Int
+    ): PaginatedBooks!
     book(id: Int!): Book
   }
 

@@ -27,8 +27,8 @@ import { BookCard } from "./BookCard";
 import { BookFilters } from "./BookFilters";
 
 const GET_BOOKS = gql`
-  query GetBooks($page: Int, $limit: Int, $search: String) {
-    books(page: $page, limit: $limit, search: $search) {
+  query GetBooks($page: Int, $limit: Int, $search: String, $author_id: Int) {
+    books(page: $page, limit: $limit, search: $search, author_id: $author_id) {
       books {
         id
         title
@@ -95,12 +95,20 @@ type BookFormValues = {
   author_id: string;
 };
 
+type Filters = {
+  search: string;
+  author_id: number | undefined;
+};
+
 export default function BooksList() {
   const [page, setPage] = useState(1);
   const [isAuthorDialogOpen, setIsAuthorDialogOpen] = useState(false);
   const [isBookDialogOpen, setIsBookDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [filters, setFilters] = useState({ search: "" });
+  const [filters, setFilters] = useState<Filters>({
+    search: "",
+    author_id: undefined,
+  });
 
   const {
     data: booksData,
@@ -108,7 +116,12 @@ export default function BooksList() {
     error: booksError,
     refetch: refetchBooks,
   } = useQuery(GET_BOOKS, {
-    variables: { page, limit: PAGE_SIZE, search: filters.search },
+    variables: {
+      page,
+      limit: PAGE_SIZE,
+      search: filters.search,
+      author_id: filters.author_id,
+    },
   });
 
   const { data: authorsData, refetch: refetchAuthors } = useQuery(GET_AUTHORS);
@@ -172,7 +185,12 @@ export default function BooksList() {
         },
       });
       setPage(1);
-      await refetchBooks({ page: 1, limit: PAGE_SIZE, search: filters.search });
+      await refetchBooks({
+        page: 1,
+        limit: PAGE_SIZE,
+        search: filters.search,
+        author_id: filters.author_id,
+      });
       setIsBookDialogOpen(false);
     } catch (error) {
       console.error("Error creating book:", error);
@@ -181,10 +199,21 @@ export default function BooksList() {
     }
   };
 
-  const handleFilterChange = (newFilters: { search: string }) => {
-    setFilters(newFilters);
+  const handleFilterChange = (newFilters: {
+    search: string;
+    author_id?: number;
+  }) => {
+    setFilters({
+      search: newFilters.search,
+      author_id: newFilters.author_id,
+    });
     setPage(1); // Reset to first page when filters change
-    refetchBooks({ page: 1, limit: PAGE_SIZE, search: newFilters.search });
+    refetchBooks({
+      page: 1,
+      limit: PAGE_SIZE,
+      search: newFilters.search,
+      author_id: newFilters.author_id,
+    });
   };
 
   return (
@@ -235,6 +264,7 @@ export default function BooksList() {
         <BookFilters
           onFilterChange={handleFilterChange}
           activeFilters={filters}
+          authors={authorsData?.authors || []}
         />
       </div>
 

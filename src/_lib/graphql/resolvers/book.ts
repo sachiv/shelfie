@@ -1,6 +1,6 @@
 import Author from "@/_lib/models/Author";
 import Book from "@/_lib/models/Book";
-import { Op } from "sequelize";
+import { Op, WhereOptions } from "sequelize";
 
 // Add this type above the resolvers object
 type BookInput = {
@@ -15,27 +15,36 @@ const resolvers = {
   Query: {
     books: async (
       _: unknown,
-      args: { page?: number; limit?: number; search?: string }
+      args: {
+        page?: number;
+        limit?: number;
+        search?: string;
+        author_id?: number;
+      }
     ) => {
       const page = args.page || 1;
       const limit = args.limit || 10;
       const offset = (page - 1) * limit;
 
-      const whereClause = args.search
-        ? {
-            [Op.or]: [
-              { title: { [Op.iLike]: `%${args.search}%` } },
-              { "$author.name$": { [Op.iLike]: `%${args.search}%` } },
-            ],
-          }
-        : {};
+      const whereClause: WhereOptions = {};
+
+      if (args.search) {
+        whereClause[Op.or] = [
+          { title: { [Op.iLike]: `%${args.search}%` } },
+          { "$author.name$": { [Op.iLike]: `%${args.search}%` } },
+        ];
+      }
+
+      if (args.author_id) {
+        whereClause.author_id = args.author_id;
+      }
 
       const { count, rows } = await Book.findAndCountAll({
         include: [
           {
             model: Author,
             as: "author",
-            required: args.search ? true : false, // Only require author join if searching
+            required: args.search ? true : false,
           },
         ],
         where: whereClause,
