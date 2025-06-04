@@ -89,7 +89,9 @@ export function AddAuthorForm({ onSubmit, isLoading }: AddAuthorFormProps) {
               <FormControl>
                 <Input type="date" {...field} />
               </FormControl>
-              <FormDescription>The author's date of birth.</FormDescription>
+              <FormDescription>
+                The author&apos;s date of birth.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

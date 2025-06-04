@@ -22,6 +22,7 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { AddAuthorForm } from "./AddAuthorForm";
+import { AddBookForm } from "./AddBookForm";
 import { BookCard } from "./BookCard";
 
 const GET_BOOKS = gql`
@@ -44,11 +45,36 @@ const GET_BOOKS = gql`
   }
 `;
 
+const GET_AUTHORS = gql`
+  query GetAuthors {
+    authors {
+      id
+      name
+    }
+  }
+`;
+
 const CREATE_AUTHOR = gql`
   mutation CreateAuthor($author: AuthorInput!) {
     createAuthor(author: $author) {
       id
       name
+    }
+  }
+`;
+
+const CREATE_BOOK = gql`
+  mutation CreateBook($book: BookInput!) {
+    createBook(book: $book) {
+      id
+      title
+      description
+      published_date
+      author_id
+      author {
+        id
+        name
+      }
     }
   }
 `;
@@ -61,34 +87,53 @@ type AuthorInput = {
   born_date?: string;
 };
 
+type BookFormValues = {
+  title: string;
+  description?: string;
+  published_date?: string;
+  author_id: string;
+};
+
 export default function BooksList() {
   const [page, setPage] = useState(1);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAuthorDialogOpen, setIsAuthorDialogOpen] = useState(false);
+  const [isBookDialogOpen, setIsBookDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data, loading, error } = useQuery(GET_BOOKS, {
+  const {
+    data: booksData,
+    loading: booksLoading,
+    error: booksError,
+    refetch: refetchBooks,
+  } = useQuery(GET_BOOKS, {
     variables: { page, limit: PAGE_SIZE },
   });
 
+  const { data: authorsData, refetch: refetchAuthors } = useQuery(GET_AUTHORS);
+
   const [createAuthor] = useMutation(CREATE_AUTHOR, {
+    refetchQueries: [{ query: GET_BOOKS }, { query: GET_AUTHORS }],
+  });
+
+  const [createBook] = useMutation(CREATE_BOOK, {
     refetchQueries: [{ query: GET_BOOKS }],
   });
 
-  if (loading && !data)
+  if (booksLoading && !booksData)
     return (
       <div className="flex-1 flex items-center justify-center">
         <Loader className="size-16" />
       </div>
     );
 
-  if (error)
+  if (booksError)
     return (
       <div className="flex-1 flex items-center justify-center">
-        Error: {error.message}
+        Error: {booksError.message}
       </div>
     );
 
-  const totalPages = Math.ceil(data.books.total / PAGE_SIZE);
+  const totalPages = Math.ceil(booksData.books.total / PAGE_SIZE);
 
   const handleAddAuthor = async (values: AuthorInput) => {
     try {
@@ -101,7 +146,8 @@ export default function BooksList() {
           },
         },
       });
-      setIsDialogOpen(false);
+      await refetchAuthors();
+      setIsAuthorDialogOpen(false);
     } catch (error) {
       console.error("Error creating author:", error);
     } finally {
@@ -109,12 +155,36 @@ export default function BooksList() {
     }
   };
 
+  const handleAddBook = async (values: BookFormValues) => {
+    try {
+      setIsSubmitting(true);
+      await createBook({
+        variables: {
+          book: {
+            ...values,
+            author_id: parseInt(values.author_id),
+            published_date: values.published_date
+              ? new Date(values.published_date)
+              : null,
+          },
+        },
+      });
+      setPage(1);
+      await refetchBooks({ page: 1, limit: PAGE_SIZE });
+      setIsBookDialogOpen(false);
+    } catch (error) {
+      console.error("Error creating book:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-6 flex-1 justify-between flex flex-col py-10">
-      <div className="flex justify-end mb-4">
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <div className="flex justify-end gap-4 mb-4">
+        <Dialog open={isAuthorDialogOpen} onOpenChange={setIsAuthorDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button variant="outline">
               <PlusIcon className="mr-2 h-4 w-4" />
               Add Author
             </Button>
@@ -129,10 +199,29 @@ export default function BooksList() {
             />
           </DialogContent>
         </Dialog>
+
+        <Dialog open={isBookDialogOpen} onOpenChange={setIsBookDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <PlusIcon className="mr-2 h-4 w-4" />
+              Add Book
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Book</DialogTitle>
+            </DialogHeader>
+            <AddBookForm
+              onSubmit={handleAddBook}
+              isLoading={isSubmitting}
+              authors={authorsData?.authors || []}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
 
       <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {data.books.books.map((book: Book) => (
+        {booksData.books.books.map((book: Book) => (
           <li key={book.id}>
             <BookCard book={book} />
           </li>
