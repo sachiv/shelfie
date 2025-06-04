@@ -10,6 +10,12 @@ const book = gql`
     author: Author
   }
 
+  type PaginatedBooks {
+    books: [Book!]!
+    total: Int!
+    hasMore: Boolean!
+  }
+
   input BookInput {
     id: Int
     title: String!
@@ -19,7 +25,7 @@ const book = gql`
   }
 
   extend type Query {
-    books: [Book!]!
+    books(page: Int = 1, limit: Int = 10): PaginatedBooks!
     book(id: Int!): Book
   }
 

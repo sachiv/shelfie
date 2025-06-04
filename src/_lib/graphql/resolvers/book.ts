@@ -12,15 +12,29 @@ type BookInput = {
 
 const resolvers = {
   Query: {
-    books: async () =>
-      await Book.findAll({
+    books: async (_: unknown, args: { page?: number; limit?: number }) => {
+      const page = args.page || 1;
+      const limit = args.limit || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows } = await Book.findAndCountAll({
         include: [
           {
             model: Author,
             as: "author",
           },
         ],
-      }),
+        limit,
+        offset,
+        order: [["created_at", "DESC"]],
+      });
+
+      return {
+        books: rows,
+        total: count,
+        hasMore: count > page * limit,
+      };
+    },
     book: async (_: unknown, args: { id: number }) =>
       await Book.findByPk(args.id, {
         include: [
