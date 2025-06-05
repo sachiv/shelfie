@@ -3,15 +3,13 @@ export const options = {
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DATABASE,
   host: process.env.POSTGRES_HOST,
-  port: process.env.POSTGRES_PORT
-    ? Number(process.env.POSTGRES_PORT)
-    : undefined,
   dialect: "postgres",
   logging: process.env.NODE_ENV === "development" ? console.log : false,
   migrationStorageTableName: "migrations",
+  ...(process.env.POSTGRES_PORT
+    ? { port: Number(process.env.POSTGRES_PORT) }
+    : {}),
 };
-
-console.log("## options", options);
 
 if (process.env.NODE_ENV === "production") {
   options.dialectOptions = {
