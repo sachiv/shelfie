@@ -40,9 +40,6 @@ export const BookCard = ({
   const [showDialog, setShowDialog] = useState(false);
   const [deleteBook] = useMutation(DELETE_BOOK);
 
-  if (book.created_by_id)
-    console.log("##", { user, created_by_id: book.created_by_id });
-
   const handleDelete = async () => {
     setIsDeleting(true);
     try {

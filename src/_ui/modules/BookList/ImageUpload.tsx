@@ -1,5 +1,6 @@
 "use client";
 
+import { createClient } from "@/_lib/supabase/client";
 import { Button } from "@/_ui/shadcn/button";
 import { Input } from "@/_ui/shadcn/input";
 import { UploadIcon } from "lucide-react";
@@ -17,29 +18,30 @@ export function ImageUpload({
   isLoading,
 }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
-
+  const supabase = createClient();
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault(); // Prevent form submission
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    setUploading(true);
-    onUploadStart?.();
     try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Upload failed");
+      if (!e.target.files || e.target.files.length === 0) {
+        throw new Error("You must select an image to upload.");
       }
-
-      const data = await response.json();
-      onImageUploaded(data.path);
+      setUploading(true);
+      onUploadStart?.();
+      const file = e.target.files[0];
+      const fileExt = file.name.split(".").pop();
+      const filePath = `${new Date().getTime()}.${fileExt}`;
+      const { error: uploadError, data } = await supabase.storage
+        .from("images")
+        .upload(filePath, file);
+      if (uploadError) {
+        throw uploadError;
+      }
+      onImageUploaded(
+        data?.fullPath
+          ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${data.fullPath}`
+          : ""
+      );
     } catch (error) {
       console.error("Error uploading file:", error);
     } finally {
