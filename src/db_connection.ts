@@ -9,6 +9,8 @@ const dbOptions: SequelizeOptions = {
   dialectModule: pg,
 };
 
+console.log("## dbOptions", dbOptions);
+
 const sequelize = new Sequelize(dbOptions);
 
 export default sequelize;
