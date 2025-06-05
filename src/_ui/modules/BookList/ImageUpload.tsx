@@ -18,7 +18,6 @@ export function ImageUpload({
   isLoading,
 }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
-  const supabase = createClient();
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault(); // Prevent form submission
 
@@ -28,20 +27,39 @@ export function ImageUpload({
       }
       setUploading(true);
       onUploadStart?.();
-      const file = e.target.files[0];
-      const fileExt = file.name.split(".").pop();
-      const filePath = `${new Date().getTime()}.${fileExt}`;
-      const { error: uploadError, data } = await supabase.storage
-        .from("images")
-        .upload(filePath, file);
-      if (uploadError) {
-        throw uploadError;
+
+      // If the environment variable is set, use Supabase to upload the image.
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+        const file = e.target.files[0];
+        const fileExt = file.name.split(".").pop();
+        const filePath = `${new Date().getTime()}.${fileExt}`;
+        const supabase = createClient();
+        const { error: uploadError, data } = await supabase.storage
+          .from("images")
+          .upload(filePath, file);
+        if (uploadError) {
+          throw uploadError;
+        }
+        onImageUploaded(
+          data?.fullPath
+            ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${data.fullPath}`
+            : ""
+        );
+      } else {
+        const formData = new FormData();
+        formData.append("file", e.target.files[0]);
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Upload failed");
+        }
+
+        const data = await response.json();
+        onImageUploaded(data.path);
       }
-      onImageUploaded(
-        data?.fullPath
-          ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${data.fullPath}`
-          : ""
-      );
     } catch (error) {
       console.error("Error uploading file:", error);
     } finally {
