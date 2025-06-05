@@ -9,6 +9,11 @@ const dbOptions: SequelizeOptions = {
   dialectModule: pg,
 };
 
-const sequelize = new Sequelize(process.env.POSTGRES_URL || "", dbOptions);
+const sequelize = new Sequelize(
+  process.env.POSTGRES_URL
+    ? process.env.POSTGRES_URL.replace("sslmode=require&", "")
+    : "",
+  dbOptions
+);
 
 export default sequelize;
