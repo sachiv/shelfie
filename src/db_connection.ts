@@ -9,6 +9,6 @@ const dbOptions: SequelizeOptions = {
   dialectModule: pg,
 };
 
-const sequelize = new Sequelize(dbOptions);
+const sequelize = new Sequelize(process.env.POSTGRES_URL || "", dbOptions);
 
 export default sequelize;

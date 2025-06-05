@@ -4,17 +4,18 @@ export const options = {
   database: process.env.POSTGRES_DATABASE,
   host: process.env.POSTGRES_HOST,
   dialect: "postgres",
-  logging: process.env.NODE_ENV === "development" ? console.log : false,
+  logging: process.env.VERCEL_ENV === "development" ? console.log : false,
   migrationStorageTableName: "migrations",
   ...(process.env.POSTGRES_PORT
     ? { port: Number(process.env.POSTGRES_PORT) }
     : {}),
 };
 
-if (process.env.NODE_ENV === "production") {
+if (process.env.VERCEL_ENV === "production") {
   options.dialectOptions = {
     ssl: {
-      rejectUnauthorized: true,
+      rejectUnauthorized: false,
+      require: true,
     },
   };
 }
