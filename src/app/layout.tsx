@@ -3,6 +3,7 @@ import { StackProvider, StackTheme } from "@stackframe/stack";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Geist, Geist_Mono } from "next/font/google";
+import { options } from "../../db/config/config.mjs";
 import { stackServerApp } from "../stack";
 import ApolloWrapper from "./ApolloWrapper";
 import "./globals.css";
@@ -27,6 +28,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log("## options", options);
   return (
     <html lang="en">
       <body
