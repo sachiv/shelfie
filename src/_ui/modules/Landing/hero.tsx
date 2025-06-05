@@ -1,6 +1,6 @@
 import { Badge } from "@/_ui/shadcn/badge";
 import { Button } from "@/_ui/shadcn/button";
-import { ArrowUpRight, CirclePlay } from "lucide-react";
+import { BookOpen, PenIcon } from "lucide-react";
 import Link from "next/link";
 
 const Hero = () => {
@@ -25,7 +25,7 @@ const Hero = () => {
                 size="lg"
                 className="w-full sm:w-auto rounded-full text-base"
               >
-                Browse Books <ArrowUpRight className="!h-5 !w-5" />
+                <BookOpen className="!h-5 !w-5" /> Browse Books
               </Button>
             </Link>
             <Link href="/authors">
@@ -34,7 +34,7 @@ const Hero = () => {
                 size="lg"
                 className="w-full sm:w-auto rounded-full text-base shadow-none"
               >
-                <CirclePlay className="!h-5 !w-5" /> Meet Authors
+                <PenIcon className="!h-5 !w-5" /> Meet Authors
               </Button>
             </Link>
           </div>

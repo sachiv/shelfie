@@ -1,6 +1,7 @@
 "use client";
 
-import { gql, useQuery } from "@apollo/client";
+import { GET_AUTHOR } from "@/_lib/graphql/schema/author";
+import { useQuery } from "@apollo/client";
 import { format, isValid } from "date-fns";
 import { ImageIcon } from "lucide-react";
 import Image from "next/image";
@@ -13,25 +14,6 @@ interface Book {
   published_date?: Date;
   image?: string;
 }
-
-const GET_AUTHOR = gql`
-  query GetAuthor($id: Int!) {
-    author(id: $id) {
-      id
-      name
-      biography
-      born_date
-      image
-      books {
-        id
-        title
-        description
-        published_date
-        image
-      }
-    }
-  }
-`;
 
 export default function AuthorDetailsPage() {
   const params = useParams();

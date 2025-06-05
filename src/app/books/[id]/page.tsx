@@ -1,30 +1,12 @@
 "use client";
 
+import { GET_BOOK } from "@/_lib/graphql/schema/book";
 import { BookComments } from "@/_ui/modules/BookList/BookComments";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { format, isValid } from "date-fns";
 import { ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-
-const GET_BOOK = gql`
-  query GetBook($id: Int!) {
-    book(id: $id) {
-      id
-      title
-      description
-      published_date
-      image
-      author {
-        id
-        name
-        biography
-        born_date
-        image
-      }
-    }
-  }
-`;
 
 export default function BookDetailsPage() {
   const params = useParams();

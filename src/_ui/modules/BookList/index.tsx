@@ -1,5 +1,7 @@
 "use client";
 
+import { CREATE_AUTHOR, GET_AUTHORS } from "@/_lib/graphql/schema/author";
+import { CREATE_BOOK, GET_BOOKS } from "@/_lib/graphql/schema/book";
 import Book from "@/_lib/models/Book";
 import { Loader } from "@/_ui/components/Loader";
 import { Button } from "@/_ui/shadcn/button";
@@ -18,7 +20,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/_ui/shadcn/pagination";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
@@ -26,85 +28,6 @@ import { AddAuthorForm } from "./AddAuthorForm";
 import { AddBookForm } from "./AddBookForm";
 import { BookCard } from "./BookCard";
 import { BookFilters } from "./BookFilters";
-
-const GET_BOOKS = gql`
-  query GetBooks(
-    $page: Int
-    $limit: Int
-    $search: String
-    $author_id: Int
-    $published_from: DateTime
-    $published_to: DateTime
-  ) {
-    books(
-      page: $page
-      limit: $limit
-      search: $search
-      author_id: $author_id
-      published_from: $published_from
-      published_to: $published_to
-    ) {
-      books {
-        id
-        title
-        description
-        published_date
-        author_id
-        author {
-          id
-          name
-          biography
-          born_date
-          image
-        }
-        image
-      }
-      total
-      hasMore
-    }
-  }
-`;
-
-const GET_AUTHORS = gql`
-  query GetAuthors {
-    authors {
-      id
-      name
-      biography
-      born_date
-      image
-    }
-  }
-`;
-
-const CREATE_AUTHOR = gql`
-  mutation CreateAuthor($author: AuthorInput!) {
-    createAuthor(author: $author) {
-      id
-      name
-      biography
-      born_date
-      image
-    }
-  }
-`;
-
-const CREATE_BOOK = gql`
-  mutation CreateBook($book: BookInput!) {
-    createBook(book: $book) {
-      id
-      title
-      description
-      published_date
-      author_id
-      author {
-        id
-        name
-      }
-      image
-    }
-  }
-`;
 
 const PAGE_SIZE = 12;
 

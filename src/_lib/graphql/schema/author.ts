@@ -88,4 +88,23 @@ export const CREATE_AUTHOR = gql`
   }
 `;
 
+export const GET_AUTHOR = gql`
+  query GetAuthor($id: Int!) {
+    author(id: $id) {
+      id
+      name
+      biography
+      born_date
+      image
+      books {
+        id
+        title
+        description
+        published_date
+        image
+      }
+    }
+  }
+`;
+
 export default author;

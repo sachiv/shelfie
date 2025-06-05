@@ -1,6 +1,6 @@
 "use client";
 
-import { ADD_BOOK_RATING } from "@/_lib/graphql/schema/book";
+import { ADD_BOOK_RATING, GET_BOOK } from "@/_lib/graphql/schema/book";
 import { Button } from "@/_ui/shadcn/button";
 import {
   Form,
@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from "@/_ui/shadcn/form";
 import { Textarea } from "@/_ui/shadcn/textarea";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { Loader2, Star } from "lucide-react";
@@ -25,19 +25,6 @@ interface Rating {
   comment: string;
   createdAt: string;
 }
-
-const GET_BOOK_RATINGS = gql`
-  query GetBookRatings($id: Int!) {
-    book(id: $id) {
-      id
-      ratings {
-        rating
-        comment
-        createdAt
-      }
-    }
-  }
-`;
 
 const formSchema = z.object({
   rating: z.number().min(1).max(5),
@@ -54,7 +41,7 @@ interface BookCommentsProps {
 
 export function BookComments({ bookId }: BookCommentsProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { data, refetch } = useQuery(GET_BOOK_RATINGS, {
+  const { data, refetch } = useQuery(GET_BOOK, {
     variables: { id: bookId },
   });
 
