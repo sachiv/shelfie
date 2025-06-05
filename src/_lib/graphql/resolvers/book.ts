@@ -1,5 +1,7 @@
 import Author from "@/_lib/models/Author";
 import Book from "@/_lib/models/Book";
+import connectDB from "@/_lib/mongo/connectMongo";
+import BookMongo from "@/_lib/mongo/models/Book";
 import { GraphQLScalarType, Kind, ValueNode } from "graphql";
 import { Op, WhereOptions } from "sequelize";
 
@@ -98,21 +100,45 @@ const resolvers = {
         order: [["created_at", "DESC"]],
       });
 
+      // Fetch ratings from MongoDB
+      await connectDB();
+      const booksWithRatings = await Promise.all(
+        books.map(async (book) => {
+          const mongoBook = await BookMongo.findOne({ id: book.id });
+          return {
+            ...book.toJSON(),
+            ratings: mongoBook?.ratings || [],
+          };
+        })
+      );
+
       return {
-        books,
+        books: booksWithRatings,
         total,
         hasMore: total > page * limit,
       };
     },
-    book: async (_: unknown, args: { id: number }) =>
-      await Book.findByPk(args.id, {
+    book: async (_: unknown, args: { id: number }) => {
+      const book = await Book.findByPk(args.id, {
         include: [
           {
             model: Author,
             as: "author",
           },
         ],
-      }),
+      });
+
+      if (!book) return null;
+
+      // Fetch ratings from MongoDB
+      await connectDB();
+      const mongoBook = await BookMongo.findOne({ id: args.id });
+
+      return {
+        ...book.toJSON(),
+        ratings: mongoBook?.ratings || [],
+      };
+    },
   },
 
   Book: {
@@ -144,6 +170,43 @@ const resolvers = {
       }
       await book.destroy();
       return book;
+    },
+    addBookRating: async (
+      _: unknown,
+      args: { bookId: number; rating: { rating: number; comment: string } }
+    ) => {
+      await connectDB();
+
+      const book = await BookMongo.findOne({ id: args.bookId });
+      if (!book) {
+        // Create new book entry if it doesn't exist
+        const newBook = new BookMongo({
+          id: args.bookId,
+          ratings: [
+            {
+              ...args.rating,
+              createdAt: new Date(),
+            },
+          ],
+        });
+        await newBook.save();
+        return {
+          id: args.bookId,
+          ratings: newBook.ratings,
+        };
+      }
+
+      // Add new rating to existing book
+      book.ratings.push({
+        ...args.rating,
+        createdAt: new Date(),
+      });
+      await book.save();
+
+      return {
+        id: args.bookId,
+        ratings: book.ratings,
+      };
     },
   },
 };

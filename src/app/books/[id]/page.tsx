@@ -1,5 +1,6 @@
 "use client";
 
+import { BookComments } from "@/_ui/modules/BookList/BookComments";
 import { gql, useQuery } from "@apollo/client";
 import { format, isValid } from "date-fns";
 import { ImageIcon } from "lucide-react";
@@ -147,6 +148,11 @@ export default function BookDetailsPage() {
               </div>
             </div>
           )}
+
+          {/* Comments Section */}
+          <div className="border-t pt-6">
+            <BookComments bookId={book.id} />
+          </div>
         </div>
       </div>
     </div>
