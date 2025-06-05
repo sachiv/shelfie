@@ -67,7 +67,8 @@ const resolvers = {
       const whereClause: WhereOptions = {};
 
       if (search) {
-        whereClause[Op.or] = [
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (whereClause as any)[Op.or] = [
           { title: { [Op.iLike]: `%${search}%` } },
           { "$author.name$": { [Op.iLike]: `%${search}%` } },
         ];

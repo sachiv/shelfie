@@ -1,14 +1,18 @@
 import mongoose from "mongoose";
 
-const DATABASE_URL = process.env.MONGO_URL;
-
-let cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+declare global {
+  // eslint-disable-next-line no-var, @typescript-eslint/no-explicit-any
+  var mongoose: { conn: any; promise: any } | undefined;
 }
 
+const DATABASE_URL = process.env.MONGO_URL;
+
 async function connectDB() {
+  let cached = global.mongoose;
+  if (!cached) {
+    cached = global.mongoose = { conn: null, promise: null };
+  }
+
   if (cached.conn) {
     return cached.conn;
   }

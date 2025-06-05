@@ -32,7 +32,8 @@ const resolvers = {
       const whereClause: WhereOptions = {};
 
       if (search) {
-        whereClause[Op.or] = [
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (whereClause as any)[Op.or] = [
           { name: { [Op.iLike]: `%${search}%` } },
           { biography: { [Op.iLike]: `%${search}%` } },
         ] as unknown as WhereOptions;

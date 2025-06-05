@@ -13,4 +13,9 @@ const server = new ApolloServer({
   },
 });
 
-export const POST = startServerAndCreateNextHandler(server);
+// This wrapper ensures compatibility with Next.js app directory route expectations
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function POST(request: Request, _context: unknown) {
+  // context is required by Next.js, but not used by Apollo
+  return startServerAndCreateNextHandler(server)(request);
+}
