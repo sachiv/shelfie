@@ -34,7 +34,6 @@ export function DetailsSheet({
   const formatDate = (date: Date | string | undefined) => {
     if (!date) return null;
     const dateObj = typeof date === "string" ? new Date(date) : date;
-    console.log("##", { dateObj, book });
     return isValid(dateObj) ? format(dateObj, "MMMM d, yyyy") : null;
   };
 
