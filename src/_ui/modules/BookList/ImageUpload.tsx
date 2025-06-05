@@ -19,6 +19,7 @@ export function ImageUpload({
   const [uploading, setUploading] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault(); // Prevent form submission
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -38,12 +39,17 @@ export function ImageUpload({
       }
 
       const data = await response.json();
-      onImageUploaded(`/uploads/${data.filename}`);
+      onImageUploaded(data.path);
     } catch (error) {
       console.error("Error uploading file:", error);
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent form submission
+    document.getElementById("image-upload")?.click();
   };
 
   return (
@@ -59,7 +65,7 @@ export function ImageUpload({
       <Button
         type="button"
         variant="outline"
-        onClick={() => document.getElementById("image-upload")?.click()}
+        onClick={handleButtonClick}
         disabled={isLoading || uploading}
         className="w-full"
       >

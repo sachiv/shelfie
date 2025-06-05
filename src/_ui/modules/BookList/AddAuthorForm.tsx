@@ -1,5 +1,6 @@
 "use client";
 
+import { CREATE_AUTHOR } from "@/_lib/graphql/schema/author";
 import { Button } from "@/_ui/shadcn/button";
 import {
   Form,
@@ -12,6 +13,7 @@ import {
 } from "@/_ui/shadcn/form";
 import { Input } from "@/_ui/shadcn/input";
 import { Textarea } from "@/_ui/shadcn/textarea";
+import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, X } from "lucide-react";
 import Image from "next/image";
@@ -38,6 +40,10 @@ interface AddAuthorFormProps {
 
 export function AddAuthorForm({ onSubmit, isLoading }: AddAuthorFormProps) {
   const [isImageUploading, setIsImageUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [createAuthor] = useMutation(CREATE_AUTHOR);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,9 +54,33 @@ export function AddAuthorForm({ onSubmit, isLoading }: AddAuthorFormProps) {
     },
   });
 
+  const handleSubmit = async (values: FormValues) => {
+    try {
+      setIsSubmitting(true);
+      await createAuthor({
+        variables: {
+          author: {
+            ...values,
+            born_date: values.born_date ? new Date(values.born_date) : null,
+          },
+        },
+      });
+      onSubmit(values);
+    } catch (error) {
+      console.error("Error creating author:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleImageUploaded = (path: string) => {
+    form.setValue("image", path, { shouldDirty: true });
+    setIsImageUploading(false);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="name"
@@ -113,10 +143,7 @@ export function AddAuthorForm({ onSubmit, isLoading }: AddAuthorFormProps) {
               <FormControl>
                 <div className="space-y-4">
                   <ImageUpload
-                    onImageUploaded={(path) => {
-                      field.onChange(path);
-                      setIsImageUploading(false);
-                    }}
+                    onImageUploaded={handleImageUploaded}
                     onUploadStart={() => setIsImageUploading(true)}
                     isLoading={isLoading}
                   />
@@ -150,9 +177,9 @@ export function AddAuthorForm({ onSubmit, isLoading }: AddAuthorFormProps) {
         <Button
           type="submit"
           className="w-full"
-          disabled={isLoading || isImageUploading}
+          disabled={isLoading || isImageUploading || isSubmitting}
         >
-          {isLoading || isImageUploading ? (
+          {isLoading || isImageUploading || isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               {isImageUploading ? "Uploading Image..." : "Adding..."}

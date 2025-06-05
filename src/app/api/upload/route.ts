@@ -19,7 +19,13 @@ export async function POST(req: Request) {
     // Create uploads directory if it doesn't exist
     await mkdir(uploadDir, { recursive: true });
     await writeFile(filepath, buffer);
-    return NextResponse.json({ success: true, filename });
+
+    // Return the full URL path for the image
+    return NextResponse.json({
+      success: true,
+      filename,
+      path: `/uploads/${filename}`,
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Failed to save file" }, { status: 500 });
