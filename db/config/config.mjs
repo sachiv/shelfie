@@ -3,7 +3,7 @@ export const options = {
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DATABASE,
   host: process.env.POSTGRES_HOST,
-  port: Number(process.env.POSTGRES_PORT || 5432),
+  port: process.env.POSTGRES_PORT && Number(process.env.POSTGRES_PORT),
   dialect: "postgres",
   logging: process.env.NODE_ENV === "development" ? console.log : false,
   migrationStorageTableName: "migrations",
