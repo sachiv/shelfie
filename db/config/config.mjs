@@ -11,6 +11,8 @@ export const options = {
   migrationStorageTableName: "migrations",
 };
 
+console.log("## options", options);
+
 if (process.env.NODE_ENV === "production") {
   options.dialectOptions = {
     ssl: {
