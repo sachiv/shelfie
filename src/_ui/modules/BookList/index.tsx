@@ -1,7 +1,11 @@
 "use client";
 
-import { CREATE_AUTHOR, GET_AUTHORS } from "@/_lib/graphql/schema/author";
-import { CREATE_BOOK, GET_BOOKS } from "@/_lib/graphql/schema/book";
+import { CREATE_AUTHOR, GET_AUTHOR_NAMES } from "@/_lib/graphql/schema/author";
+import {
+  CREATE_BOOK,
+  GET_BOOKS,
+  UPDATE_BOOK,
+} from "@/_lib/graphql/schema/book";
 import Book from "@/_lib/models/Book";
 import { Loader } from "@/_ui/components/Loader";
 import { Button } from "@/_ui/shadcn/button";
@@ -21,7 +25,7 @@ import {
   PaginationPrevious,
 } from "@/_ui/shadcn/pagination";
 import { useMutation, useQuery } from "@apollo/client";
-import { PlusIcon } from "lucide-react";
+import { Pencil, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { AddAuthorForm } from "./AddAuthorForm";
@@ -42,6 +46,7 @@ type BookFormValues = {
   description?: string;
   published_date?: string;
   author_id: string;
+  image?: string;
 };
 
 interface Filters {
@@ -60,6 +65,7 @@ export default function BooksList() {
     author_id: undefined,
     published_date: undefined,
   });
+  const [editBook, setEditBook] = useState<Book | null>(null);
 
   const {
     data: booksData,
@@ -77,13 +83,18 @@ export default function BooksList() {
     },
   });
 
-  const { data: authorsData, refetch: refetchAuthors } = useQuery(GET_AUTHORS);
+  const { data: authorsData, refetch: refetchAuthors } =
+    useQuery(GET_AUTHOR_NAMES);
 
   const [createAuthor] = useMutation(CREATE_AUTHOR, {
-    refetchQueries: [{ query: GET_BOOKS }, { query: GET_AUTHORS }],
+    refetchQueries: [{ query: GET_BOOKS }, { query: GET_AUTHOR_NAMES }],
   });
 
   const [createBook] = useMutation(CREATE_BOOK, {
+    refetchQueries: [{ query: GET_BOOKS }],
+  });
+
+  const [updateBook] = useMutation(UPDATE_BOOK, {
     refetchQueries: [{ query: GET_BOOKS }],
   });
 
@@ -154,6 +165,31 @@ export default function BooksList() {
     }
   };
 
+  const handleEditBook = async (values: BookFormValues) => {
+    if (!editBook) return;
+    try {
+      setIsSubmitting(true);
+      await updateBook({
+        variables: {
+          book: {
+            ...values,
+            id: editBook.id,
+            author_id: parseInt(values.author_id),
+            published_date: values.published_date
+              ? new Date(values.published_date)
+              : null,
+          },
+        },
+      });
+      setEditBook(null);
+      await refetchBooks();
+    } catch (error) {
+      console.error("Error updating book:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleFilterChange = (newFilters: Filters) => {
     setFilters(newFilters);
     setPage(1); // Reset to first page when filters change
@@ -206,7 +242,7 @@ export default function BooksList() {
               <AddBookForm
                 onSubmit={handleAddBook}
                 isLoading={isSubmitting}
-                authors={authorsData?.authors || []}
+                authors={authorsData?.authors?.authors || []}
               />
             </DialogContent>
           </Dialog>
@@ -215,14 +251,54 @@ export default function BooksList() {
         <BookFilters
           onFilterChange={handleFilterChange}
           activeFilters={filters}
-          authors={authorsData?.authors || []}
+          authors={authorsData?.authors?.authors || []}
         />
       </div>
 
+      <Dialog
+        open={!!editBook}
+        onOpenChange={(open) => !open && setEditBook(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Book</DialogTitle>
+          </DialogHeader>
+          {editBook && (
+            <AddBookForm
+              onSubmit={handleEditBook}
+              isLoading={isSubmitting}
+              authors={authorsData?.authors?.authors || []}
+              initialValues={{
+                title: editBook.title,
+                description: editBook.description || "",
+                published_date: editBook.published_date
+                  ? new Date(editBook.published_date).toISOString().slice(0, 10)
+                  : "",
+                author_id: String(editBook.author_id),
+                image: editBook.image || "",
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {booksData.books.books.map((book: Book) => (
-          <li key={book.id}>
-            <BookCard book={book} />
+          <li key={book.id} className="relative group">
+            <BookCard
+              book={book}
+              onDeleted={() => refetchBooks()}
+              onEdit={() => setEditBook(book)}
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition"
+              onClick={() => setEditBook(book)}
+              title="Edit Book"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
           </li>
         ))}
       </ul>

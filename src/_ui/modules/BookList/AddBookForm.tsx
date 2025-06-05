@@ -45,12 +45,14 @@ interface AddBookFormProps {
   onSubmit: (values: FormValues) => void;
   isLoading?: boolean;
   authors: Array<{ id: number; name: string }>;
+  initialValues?: Partial<FormValues>;
 }
 
 export function AddBookForm({
   onSubmit,
   isLoading,
   authors,
+  initialValues,
 }: AddBookFormProps) {
   const [isImageUploading, setIsImageUploading] = useState(false);
   const form = useForm<FormValues>({
@@ -61,6 +63,7 @@ export function AddBookForm({
       published_date: "",
       author_id: "",
       image: "",
+      ...initialValues,
     },
   });
 
@@ -199,8 +202,14 @@ export function AddBookForm({
           {isLoading || isImageUploading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {isImageUploading ? "Uploading Image..." : "Adding..."}
+              {isImageUploading
+                ? "Uploading Image..."
+                : initialValues
+                ? "Saving..."
+                : "Adding..."}
             </>
+          ) : initialValues ? (
+            "Save Changes"
           ) : (
             "Add Book"
           )}

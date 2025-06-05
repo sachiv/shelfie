@@ -107,4 +107,15 @@ export const GET_AUTHOR = gql`
   }
 `;
 
+export const GET_AUTHOR_NAMES = gql`
+  query GetAuthorNames {
+    authors(page: 1, limit: 1000) {
+      authors {
+        id
+        name
+      }
+    }
+  }
+`;
+
 export default author;

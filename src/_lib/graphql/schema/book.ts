@@ -156,4 +156,29 @@ export const ADD_BOOK_RATING = gql`
   }
 `;
 
+export const DELETE_BOOK = gql`
+  mutation DeleteBook($id: Int!) {
+    deleteBook(id: $id) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_BOOK = gql`
+  mutation UpdateBook($book: BookInput!) {
+    updateBook(book: $book) {
+      id
+      title
+      description
+      published_date
+      author_id
+      image
+      author {
+        id
+        name
+      }
+    }
+  }
+`;
+
 export default book;
