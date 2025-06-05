@@ -15,6 +15,7 @@ import { Textarea } from "@/_ui/shadcn/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { ImageUpload } from "./ImageUpload";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -22,6 +23,7 @@ const formSchema = z.object({
   }),
   biography: z.string().optional(),
   born_date: z.string().optional(),
+  image: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -92,6 +94,24 @@ export function AddAuthorForm({ onSubmit, isLoading }: AddAuthorFormProps) {
               <FormDescription>
                 The author&apos;s date of birth.
               </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Author Image</FormLabel>
+              <FormControl>
+                <ImageUpload
+                  onImageUploaded={field.onChange}
+                  isLoading={isLoading}
+                />
+              </FormControl>
+              <FormDescription>Upload an image of the author.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

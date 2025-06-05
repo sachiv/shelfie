@@ -8,6 +8,7 @@ const book = gql`
     published_date: String
     author_id: Int!
     author: Author
+    image: String
   }
 
   type PaginatedBooks {
@@ -22,6 +23,7 @@ const book = gql`
     description: String
     published_date: String
     author_id: Int!
+    image: String
   }
 
   extend type Query {

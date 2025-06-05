@@ -6,6 +6,7 @@ const author = gql`
     name: String!
     biography: String
     born_date: String
+    image: String
   }
 
   input AuthorInput {
@@ -13,6 +14,7 @@ const author = gql`
     name: String!
     biography: String
     born_date: String
+    image: String
   }
 
   extend type Query {

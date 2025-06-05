@@ -9,6 +9,7 @@ class Book extends Model {
   public description!: string;
   public published_date!: Date;
   public author_id!: number;
+  public image?: string;
   public author?: {
     id: number;
     name: string;
@@ -35,6 +36,10 @@ Book.init(
     author_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    image: {
+      type: new DataTypes.STRING(),
+      allowNull: true,
     },
   },
   {

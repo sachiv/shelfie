@@ -21,6 +21,10 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true,
       },
+      image: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       author_id: {
         type: Sequelize.INTEGER,
         allowNull: false,

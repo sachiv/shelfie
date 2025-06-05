@@ -54,6 +54,7 @@ const GET_BOOKS = gql`
           id
           name
         }
+        image
       }
       total
       hasMore
@@ -91,6 +92,7 @@ const CREATE_BOOK = gql`
         id
         name
       }
+      image
     }
   }
 `;
