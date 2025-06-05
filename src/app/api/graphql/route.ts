@@ -1,5 +1,6 @@
 import resolvers from "@/_lib/graphql/resolvers";
 import typeDefs from "@/_lib/graphql/schema";
+import { stackServerApp } from "@/stack";
 import { ApolloServer } from "@apollo/server";
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
 
@@ -15,6 +16,12 @@ export async function POST(request: Request, _context: unknown) {
     },
   });
 
-  // context is required by Next.js, but not used by Apollo
-  return startServerAndCreateNextHandler(server)(request);
+  const handler = startServerAndCreateNextHandler(server, {
+    context: async () => {
+      const user = await stackServerApp.getUser();
+      return { user: user || undefined };
+    },
+  });
+
+  return handler(request);
 }

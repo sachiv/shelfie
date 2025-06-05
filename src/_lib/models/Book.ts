@@ -10,6 +10,7 @@ class Book extends Model {
   public published_date!: Date;
   public author_id!: number;
   public image?: string;
+  public created_by_id?: string;
   public author?: {
     id: number;
     name: string;
@@ -38,6 +39,10 @@ Book.init(
       allowNull: false,
     },
     image: {
+      type: new DataTypes.STRING(),
+      allowNull: true,
+    },
+    created_by_id: {
       type: new DataTypes.STRING(),
       allowNull: true,
     },

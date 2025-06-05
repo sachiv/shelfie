@@ -9,6 +9,7 @@ type AuthorInput = {
   biography?: string;
   born_date?: Date;
   image?: string;
+  created_by_id?: string;
 };
 
 const resolvers = {
@@ -85,8 +86,15 @@ const resolvers = {
   },
 
   Mutation: {
-    createAuthor: async (_: unknown, args: { author: AuthorInput }) => {
-      const author = await Author.create(args.author);
+    createAuthor: async (
+      _: unknown,
+      args: { author: AuthorInput },
+      context: { user?: { id: string } }
+    ) => {
+      const author = await Author.create({
+        ...args.author,
+        created_by_id: context.user?.id,
+      });
       return author;
     },
     updateAuthor: async (_: unknown, args: { author: AuthorInput }) => {

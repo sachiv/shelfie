@@ -98,7 +98,7 @@ const AuthorCard = ({
         >
           View Details
         </Button>
-        {user && (
+        {user && user.id === author.created_by_id && (
           <div className="flex gap-2">
             <Button
               variant="outline"

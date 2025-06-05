@@ -9,6 +9,7 @@ const author = gql`
     biography: String
     born_date: DateTime
     image: String
+    created_by_id: String
     books: [Book!]
   }
 
@@ -24,6 +25,7 @@ const author = gql`
     biography: String
     born_date: DateTime
     image: String
+    created_by_id: String
   }
 
   extend type Query {
@@ -69,6 +71,7 @@ export const GET_AUTHORS = gql`
           id
           title
         }
+        created_by_id
       }
       total
       totalPages
@@ -103,6 +106,7 @@ export const GET_AUTHOR = gql`
         published_date
         image
       }
+      created_by_id
     }
   }
 `;

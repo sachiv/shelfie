@@ -41,6 +41,8 @@ type BookInput = {
   description?: string;
   published_date?: Date;
   author_id: number;
+  image?: string;
+  created_by_id?: string;
 };
 
 const resolvers = {
@@ -150,8 +152,15 @@ const resolvers = {
   },
 
   Mutation: {
-    createBook: async (_: unknown, args: { book: BookInput }) => {
-      const book = await Book.create(args.book);
+    createBook: async (
+      _: unknown,
+      args: { book: BookInput },
+      context: { user?: { id: string } }
+    ) => {
+      const book = await Book.create({
+        ...args.book,
+        created_by_id: context.user?.id,
+      });
       return book;
     },
     updateBook: async (_: unknown, args: { book: BookInput }) => {

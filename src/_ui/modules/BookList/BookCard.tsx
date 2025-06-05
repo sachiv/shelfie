@@ -40,6 +40,9 @@ export const BookCard = ({
   const [showDialog, setShowDialog] = useState(false);
   const [deleteBook] = useMutation(DELETE_BOOK);
 
+  if (book.created_by_id)
+    console.log("##", { user, created_by_id: book.created_by_id });
+
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
@@ -89,7 +92,7 @@ export const BookCard = ({
         >
           View Details
         </Button>
-        {user && (
+        {user && user.id === book.created_by_id && (
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => onEdit?.()}>
               <Pencil className="h-5 w-5" />

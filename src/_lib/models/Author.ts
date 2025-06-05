@@ -9,6 +9,7 @@ class Author extends Model {
   public biography!: string;
   public born_date!: Date;
   public image?: string;
+  public created_by_id?: string;
 }
 
 Author.init(
@@ -29,6 +30,10 @@ Author.init(
       type: new DataTypes.DATE(),
     },
     image: {
+      type: new DataTypes.STRING(),
+      allowNull: true,
+    },
+    created_by_id: {
       type: new DataTypes.STRING(),
       allowNull: true,
     },

@@ -17,6 +17,7 @@ const book = gql`
     author_id: Int!
     author: Author
     image: String
+    created_by_id: String
     ratings: [Rating!]
   }
 
@@ -33,6 +34,7 @@ const book = gql`
     published_date: DateTime
     author_id: Int!
     image: String
+    created_by_id: String
   }
 
   input RatingInput {
@@ -97,6 +99,7 @@ export const GET_BOOKS = gql`
           comment
           createdAt
         }
+        created_by_id
       }
       total
       hasMore
@@ -125,13 +128,14 @@ export const GET_BOOK = gql`
         comment
         createdAt
       }
+      created_by_id
     }
   }
 `;
 
 export const CREATE_BOOK = gql`
-  mutation CreateBook($input: BookInput!) {
-    createBook(input: $input) {
+  mutation CreateBook($book: BookInput!) {
+    createBook(book: $book) {
       id
       title
       published_date
