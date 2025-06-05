@@ -5,6 +5,7 @@ import { useQuery } from "@apollo/client";
 import { format, isValid } from "date-fns";
 import { ImageIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 
 interface Book {
@@ -96,42 +97,44 @@ export default function AuthorDetailsPage() {
           {author.books && author.books.length > 0 && (
             <div className="border-t pt-6 space-y-6">
               <h2 className="text-xl font-semibold">Books</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {author.books.map((book: Book) => (
-                  <div
-                    key={book.id}
-                    className="flex gap-4 p-4 rounded-lg border"
-                  >
-                    <div className="relative aspect-[3/4] w-20 overflow-hidden rounded-lg border">
-                      {book.image ? (
-                        <Image
-                          src={book.image}
-                          alt={`Cover of ${book.title}`}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-muted">
-                          <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                      )}
+              <Link href={`/books/${author.books[0].id}`}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {author.books.map((book: Book) => (
+                    <div
+                      key={book.id}
+                      className="flex gap-4 p-4 rounded-lg border"
+                    >
+                      <div className="relative aspect-[3/4] w-20 overflow-hidden rounded-lg border">
+                        {book.image ? (
+                          <Image
+                            src={book.image}
+                            alt={`Cover of ${book.title}`}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-muted">
+                            <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold truncate">{book.title}</h3>
+                        {book.published_date && (
+                          <p className="text-sm text-muted-foreground">
+                            {formatDate(book.published_date)}
+                          </p>
+                        )}
+                        {book.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                            {book.description}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold truncate">{book.title}</h3>
-                      {book.published_date && (
-                        <p className="text-sm text-muted-foreground">
-                          {formatDate(book.published_date)}
-                        </p>
-                      )}
-                      {book.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                          {book.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </Link>
             </div>
           )}
         </div>

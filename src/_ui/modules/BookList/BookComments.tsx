@@ -14,6 +14,7 @@ import {
 import { Textarea } from "@/_ui/shadcn/textarea";
 import { useMutation, useQuery } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useUser } from "@stackframe/stack";
 import { format } from "date-fns";
 import { Loader2, Star } from "lucide-react";
 import { useState } from "react";
@@ -40,6 +41,7 @@ interface BookCommentsProps {
 }
 
 export function BookComments({ bookId }: BookCommentsProps) {
+  const user = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data, refetch } = useQuery(GET_BOOK, {
     variables: { id: bookId },
@@ -115,78 +117,82 @@ export function BookComments({ bookId }: BookCommentsProps) {
       )}
 
       {/* Review Form */}
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="rating"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Rating</FormLabel>
-                <FormControl>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Button
-                        key={star}
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => field.onChange(star)}
-                        className="h-8 w-8"
-                      >
-                        <Star
-                          className={`h-5 w-5 ${
-                            star <= field.value
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-muted-foreground"
-                          }`}
-                        />
-                      </Button>
-                    ))}
-                  </div>
-                </FormControl>
-                <FormDescription>
-                  Click on the stars to rate this book.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      {user ? (
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="rating"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Rating</FormLabel>
+                  <FormControl>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Button
+                          key={star}
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => field.onChange(star)}
+                          className="h-8 w-8"
+                        >
+                          <Star
+                            className={`h-5 w-5 ${
+                              star <= field.value
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-muted-foreground"
+                            }`}
+                          />
+                        </Button>
+                      ))}
+                    </div>
+                  </FormControl>
+                  <FormDescription>
+                    Click on the stars to rate this book.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="comment"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Comment</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Share your thoughts about this book..."
-                    className="resize-none"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Write a review to help others decide if they should read this
-                  book.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="comment"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Comment</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Share your thoughts about this book..."
+                      className="resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Write a review to help others decide if they should read
+                    this book.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              "Submit Review"
-            )}
-          </Button>
-        </form>
-      </Form>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                "Submit Review"
+              )}
+            </Button>
+          </form>
+        </Form>
+      ) : (
+        <p>Please sign in to leave a review</p>
+      )}
     </div>
   );
 }

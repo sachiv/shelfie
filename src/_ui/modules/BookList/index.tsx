@@ -25,7 +25,8 @@ import {
   PaginationPrevious,
 } from "@/_ui/shadcn/pagination";
 import { useMutation, useQuery } from "@apollo/client";
-import { Pencil, PlusIcon } from "lucide-react";
+import { useUser } from "@stackframe/stack";
+import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { AddAuthorForm } from "./AddAuthorForm";
@@ -66,6 +67,7 @@ export default function BooksList() {
     published_date: undefined,
   });
   const [editBook, setEditBook] = useState<Book | null>(null);
+  const user = useUser();
 
   const {
     data: booksData,
@@ -206,47 +208,51 @@ export default function BooksList() {
   return (
     <div className="space-y-6 flex-1 flex flex-col py-10">
       <div className="flex justify-between items-start gap-4 mb-4">
-        <div className="flex gap-4">
-          <Dialog
-            open={isAuthorDialogOpen}
-            onOpenChange={setIsAuthorDialogOpen}
-          >
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <PlusIcon className="mr-2 h-4 w-4" />
-                Add Author
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Author</DialogTitle>
-              </DialogHeader>
-              <AddAuthorForm
-                onSubmit={handleAddAuthor}
-                isLoading={isSubmitting}
-              />
-            </DialogContent>
-          </Dialog>
+        {user ? (
+          <div className="flex gap-4">
+            <Dialog
+              open={isAuthorDialogOpen}
+              onOpenChange={setIsAuthorDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  Add Author
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Author</DialogTitle>
+                </DialogHeader>
+                <AddAuthorForm
+                  onSubmit={handleAddAuthor}
+                  isLoading={isSubmitting}
+                />
+              </DialogContent>
+            </Dialog>
 
-          <Dialog open={isBookDialogOpen} onOpenChange={setIsBookDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <PlusIcon className="mr-2 h-4 w-4" />
-                Add Book
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Book</DialogTitle>
-              </DialogHeader>
-              <AddBookForm
-                onSubmit={handleAddBook}
-                isLoading={isSubmitting}
-                authors={authorsData?.authors?.authors || []}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
+            <Dialog open={isBookDialogOpen} onOpenChange={setIsBookDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  Add Book
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Book</DialogTitle>
+                </DialogHeader>
+                <AddBookForm
+                  onSubmit={handleAddBook}
+                  isLoading={isSubmitting}
+                  authors={authorsData?.authors?.authors || []}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+        ) : (
+          <div />
+        )}
 
         <BookFilters
           onFilterChange={handleFilterChange}
@@ -290,15 +296,6 @@ export default function BooksList() {
               onDeleted={() => refetchBooks()}
               onEdit={() => setEditBook(book)}
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition"
-              onClick={() => setEditBook(book)}
-              title="Edit Book"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
           </li>
         ))}
       </ul>

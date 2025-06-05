@@ -1,7 +1,9 @@
 import Navbar from "@/_ui/components/navbar";
+import { StackProvider, StackTheme } from "@stackframe/stack";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Geist, Geist_Mono } from "next/font/google";
+import { stackServerApp } from "../stack";
 import ApolloWrapper from "./ApolloWrapper";
 import "./globals.css";
 
@@ -30,14 +32,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ApolloWrapper>
-            <Navbar />
-            <main className="pt-16 xs:pt-20 sm:pt-24 container mx-auto min-h-svh flex flex-col items-stretch">
-              {children}
-            </main>
-          </ApolloWrapper>
-        </ThemeProvider>
+        <StackProvider app={stackServerApp}>
+          <StackTheme>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <ApolloWrapper>
+                <Navbar />
+                <main className="pt-16 xs:pt-20 sm:pt-24 container mx-auto min-h-svh flex flex-col items-stretch">
+                  {children}
+                </main>
+              </ApolloWrapper>
+            </ThemeProvider>
+          </StackTheme>
+        </StackProvider>
       </body>
     </html>
   );

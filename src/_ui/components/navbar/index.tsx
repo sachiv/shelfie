@@ -1,3 +1,4 @@
+import { UserButton } from "@stackframe/stack";
 import ThemeToggle from "../ThemeToggle";
 import { Logo } from "./Logo";
 import { NavigationSheet } from "./NavigationSheet";
@@ -14,10 +15,7 @@ const Navbar = () => {
 
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          {/* <Button variant="outline" className="hidden sm:inline-flex">
-            Sign In
-          </Button> */}
-          {/* <Button className="hidden xs:inline-flex">Get Started</Button> */}
+          <UserButton />
 
           {/* Mobile Menu */}
           <div className="md:hidden">

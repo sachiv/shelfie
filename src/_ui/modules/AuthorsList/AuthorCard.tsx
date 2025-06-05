@@ -21,6 +21,7 @@ import {
   DialogTrigger,
 } from "@/_ui/shadcn/dialog";
 import { useMutation } from "@apollo/client";
+import { useUser } from "@stackframe/stack";
 import { ImageIcon, Pencil, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -42,6 +43,7 @@ const AuthorCard = ({
   onEdit: () => void;
   onDeleted: () => void;
 }) => {
+  const user = useUser();
   const router = useRouter();
   const [showDialog, setShowDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -96,54 +98,56 @@ const AuthorCard = ({
         >
           View Details
         </Button>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onEdit}
-            title="Edit Author"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Dialog open={showDialog} onOpenChange={setShowDialog}>
-            <DialogTrigger asChild>
-              <Button
-                variant="destructive"
-                size="icon"
-                onClick={() => setShowDialog(true)}
-                disabled={isDeleting}
-                title="Delete Author"
-              >
-                <Trash2 className="h-5 w-5" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Delete Author</DialogTitle>
-                <DialogDescription>
-                  Are you sure you want to delete &quot;{author.name}&quot;?
-                  This action cannot be undone.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDialog(false)}
-                  disabled={isDeleting}
-                >
-                  Cancel
-                </Button>
+        {user && (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onEdit}
+              title="Edit Author"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Dialog open={showDialog} onOpenChange={setShowDialog}>
+              <DialogTrigger asChild>
                 <Button
                   variant="destructive"
-                  onClick={handleDelete}
+                  size="icon"
+                  onClick={() => setShowDialog(true)}
                   disabled={isDeleting}
+                  title="Delete Author"
                 >
-                  {isDeleting ? "Deleting..." : "Delete"}
+                  <Trash2 className="h-5 w-5" />
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Delete Author</DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to delete &quot;{author.name}&quot;?
+                    This action cannot be undone.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowDialog(false)}
+                    disabled={isDeleting}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? "Deleting..." : "Delete"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
       </CardFooter>
     </Card>
   );

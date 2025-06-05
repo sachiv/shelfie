@@ -20,6 +20,7 @@ import {
   PaginationPrevious,
 } from "@/_ui/shadcn/pagination";
 import { useMutation, useQuery } from "@apollo/client";
+import { useUser } from "@stackframe/stack";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { AddAuthorForm } from "../BookList/AddAuthorForm";
@@ -43,6 +44,7 @@ type AuthorFormValues = {
 };
 
 export default function AuthorsList() {
+  const user = useUser();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("name");
@@ -128,20 +130,24 @@ export default function AuthorsList() {
   return (
     <div className="space-y-6 flex-1 flex flex-col py-10">
       <div className="flex justify-between items-start gap-4 mb-4">
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusIcon className="mr-2 h-4 w-4" />
-              Add Author
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Author</DialogTitle>
-            </DialogHeader>
-            <AddAuthorForm onSubmit={handleAuthorAdded} />
-          </DialogContent>
-        </Dialog>
+        {user ? (
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <PlusIcon className="mr-2 h-4 w-4" />
+                Add Author
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Author</DialogTitle>
+              </DialogHeader>
+              <AddAuthorForm onSubmit={handleAuthorAdded} />
+            </DialogContent>
+          </Dialog>
+        ) : (
+          <div />
+        )}
 
         <AuthorFilters
           onFilterChange={handleFilterChange}
