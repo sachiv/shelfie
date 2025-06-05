@@ -1,6 +1,35 @@
 import Author from "@/_lib/models/Author";
 import Book from "@/_lib/models/Book";
+import { GraphQLScalarType, Kind, ValueNode } from "graphql";
 import { Op, WhereOptions } from "sequelize";
+
+// Add DateTime scalar resolver
+const dateTimeScalar = new GraphQLScalarType({
+  name: "DateTime",
+  description: "DateTime custom scalar type",
+  serialize(value: unknown) {
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+    return value;
+  },
+  parseValue(value: unknown) {
+    if (
+      typeof value === "string" ||
+      typeof value === "number" ||
+      value instanceof Date
+    ) {
+      return new Date(value);
+    }
+    return null;
+  },
+  parseLiteral(ast: ValueNode) {
+    if (ast.kind === Kind.STRING) {
+      return new Date(ast.value);
+    }
+    return null;
+  },
+});
 
 // Add this type above the resolvers object
 type BookInput = {
@@ -12,9 +41,10 @@ type BookInput = {
 };
 
 const resolvers = {
+  DateTime: dateTimeScalar,
   Query: {
     books: async (
-      _: any,
+      _: unknown,
       {
         page = 1,
         limit = 10,
@@ -27,8 +57,8 @@ const resolvers = {
         limit: number;
         search?: string;
         author_id?: number;
-        published_from?: string;
-        published_to?: string;
+        published_from?: Date;
+        published_to?: Date;
       }
     ) => {
       const offset = (page - 1) * limit;
@@ -48,10 +78,10 @@ const resolvers = {
       if (published_from || published_to) {
         whereClause.published_date = {};
         if (published_from) {
-          whereClause.published_date[Op.gte] = new Date(published_from);
+          whereClause.published_date[Op.gte] = published_from;
         }
         if (published_to) {
-          whereClause.published_date[Op.lte] = new Date(published_to);
+          whereClause.published_date[Op.lte] = published_to;
         }
       }
 

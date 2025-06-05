@@ -10,43 +10,58 @@ import {
 } from "@/_ui/shadcn/card";
 import { ImageIcon } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
+import { DetailsSheet } from "./DetailsSheet";
 
 export const BookCard = ({ book }: { book: Book }) => {
-  console.log("##", book);
+  const [isAuthorSheetOpen, setIsAuthorSheetOpen] = useState(false);
+
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="flex-grow">
-        <CardTitle className="line-clamp-2">{book.title}</CardTitle>
-        <CardDescription className="line-clamp-3">
-          {book.description}
-        </CardDescription>
-      </CardHeader>
-      <div className="relative aspect-[3/4] w-full overflow-hidden">
-        {book.image ? (
-          <Image
-            src={book.image}
-            alt={`Cover of ${book.title}`}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-muted">
-            <ImageIcon className="h-12 w-12 text-muted-foreground" />
-          </div>
-        )}
-      </div>
-      <CardContent>
-        <div className="flex justify-between">
-          <p className="text-sm text-muted-foreground mt-2">
-            By {book.author?.name || "Unknown Author"}
-          </p>
+    <>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="flex-grow">
+          <CardTitle className="line-clamp-2">{book.title}</CardTitle>
+        </CardHeader>
+        <div className="relative aspect-[3/4] w-full overflow-hidden">
+          {book.image ? (
+            <Image
+              src={book.image}
+              alt={`Cover of ${book.title}`}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-muted">
+              <ImageIcon className="h-12 w-12 text-muted-foreground" />
+            </div>
+          )}
         </div>
-      </CardContent>
-      <CardFooter className="mt-auto">
-        <Button variant="outline" className="w-full">
-          View Details
-        </Button>
-      </CardFooter>
-    </Card>
+        <CardContent>
+          <CardDescription className="line-clamp-3">
+            {book.description}
+          </CardDescription>
+          <div className="flex justify-between">
+            <p className="text-sm text-muted-foreground mt-2">
+              By {book.author?.name || "Unknown Author"}
+            </p>
+          </div>
+        </CardContent>
+        <CardFooter className="mt-auto">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => setIsAuthorSheetOpen(true)}
+          >
+            View Details
+          </Button>
+        </CardFooter>
+      </Card>
+
+      <DetailsSheet
+        book={book}
+        isOpen={isAuthorSheetOpen}
+        onOpenChange={setIsAuthorSheetOpen}
+      />
+    </>
   );
 };

@@ -1,11 +1,13 @@
 import { gql } from "@apollo/client";
 
 const book = gql`
+  scalar DateTime
+
   type Book {
     id: Int!
     title: String!
     description: String
-    published_date: String
+    published_date: DateTime
     author_id: Int!
     author: Author
     image: String
@@ -21,7 +23,7 @@ const book = gql`
     id: Int
     title: String!
     description: String
-    published_date: String
+    published_date: DateTime
     author_id: Int!
     image: String
   }
@@ -32,8 +34,8 @@ const book = gql`
       limit: Int = 10
       search: String
       author_id: Int
-      published_from: String
-      published_to: String
+      published_from: DateTime
+      published_to: DateTime
     ): PaginatedBooks!
     book(id: Int!): Book
   }
@@ -51,8 +53,8 @@ export const GET_BOOKS = gql`
     $limit: Int!
     $search: String
     $author_id: Int
-    $published_from: String
-    $published_to: String
+    $published_from: DateTime
+    $published_to: DateTime
   ) {
     books(
       page: $page
@@ -65,13 +67,20 @@ export const GET_BOOKS = gql`
       books {
         id
         title
+        description
         published_date
+        author_id
         author {
           id
           name
+          biography
+          born_date
+          image
         }
+        image
       }
       total
+      hasMore
     }
   }
 `;

@@ -33,8 +33,8 @@ const GET_BOOKS = gql`
     $limit: Int
     $search: String
     $author_id: Int
-    $published_from: String
-    $published_to: String
+    $published_from: DateTime
+    $published_to: DateTime
   ) {
     books(
       page: $page
@@ -53,6 +53,9 @@ const GET_BOOKS = gql`
         author {
           id
           name
+          biography
+          born_date
+          image
         }
         image
       }
@@ -67,6 +70,9 @@ const GET_AUTHORS = gql`
     authors {
       id
       name
+      biography
+      born_date
+      image
     }
   }
 `;
@@ -76,6 +82,9 @@ const CREATE_AUTHOR = gql`
     createAuthor(author: $author) {
       id
       name
+      biography
+      born_date
+      image
     }
   }
 `;
@@ -140,8 +149,8 @@ export default function BooksList() {
       limit: PAGE_SIZE,
       search: filters.search || undefined,
       author_id: filters.author_id,
-      published_from: filters.published_date?.from?.toISOString(),
-      published_to: filters.published_date?.to?.toISOString(),
+      published_from: filters.published_date?.from,
+      published_to: filters.published_date?.to,
     },
   });
 
@@ -211,8 +220,8 @@ export default function BooksList() {
         limit: PAGE_SIZE,
         search: filters.search || undefined,
         author_id: filters.author_id,
-        published_from: filters.published_date?.from?.toISOString(),
-        published_to: filters.published_date?.to?.toISOString(),
+        published_from: filters.published_date?.from,
+        published_to: filters.published_date?.to,
       });
       setIsBookDialogOpen(false);
     } catch (error) {
@@ -230,8 +239,8 @@ export default function BooksList() {
       limit: PAGE_SIZE,
       search: newFilters.search || undefined,
       author_id: newFilters.author_id,
-      published_from: newFilters.published_date?.from?.toISOString(),
-      published_to: newFilters.published_date?.to?.toISOString(),
+      published_from: newFilters.published_date?.from,
+      published_to: newFilters.published_date?.to,
     });
   };
 

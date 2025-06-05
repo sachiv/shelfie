@@ -13,6 +13,9 @@ import {
 import { Input } from "@/_ui/shadcn/input";
 import { Textarea } from "@/_ui/shadcn/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, X } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { ImageUpload } from "./ImageUpload";
@@ -34,12 +37,14 @@ interface AddAuthorFormProps {
 }
 
 export function AddAuthorForm({ onSubmit, isLoading }: AddAuthorFormProps) {
+  const [isImageUploading, setIsImageUploading] = useState(false);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       biography: "",
       born_date: "",
+      image: "",
     },
   });
 
@@ -106,10 +111,35 @@ export function AddAuthorForm({ onSubmit, isLoading }: AddAuthorFormProps) {
             <FormItem>
               <FormLabel>Author Image</FormLabel>
               <FormControl>
-                <ImageUpload
-                  onImageUploaded={field.onChange}
-                  isLoading={isLoading}
-                />
+                <div className="space-y-4">
+                  <ImageUpload
+                    onImageUploaded={(path) => {
+                      field.onChange(path);
+                      setIsImageUploading(false);
+                    }}
+                    onUploadStart={() => setIsImageUploading(true)}
+                    isLoading={isLoading}
+                  />
+                  {field.value && (
+                    <div className="relative aspect-square w-full max-w-[200px] overflow-hidden rounded-full border">
+                      <Image
+                        src={field.value}
+                        alt="Author photo preview"
+                        fill
+                        className="object-cover"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 h-6 w-6"
+                        onClick={() => field.onChange("")}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </FormControl>
               <FormDescription>Upload an image of the author.</FormDescription>
               <FormMessage />
@@ -117,8 +147,19 @@ export function AddAuthorForm({ onSubmit, isLoading }: AddAuthorFormProps) {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Adding..." : "Add Author"}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isLoading || isImageUploading}
+        >
+          {isLoading || isImageUploading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {isImageUploading ? "Uploading Image..." : "Adding..."}
+            </>
+          ) : (
+            "Add Author"
+          )}
         </Button>
       </form>
     </Form>

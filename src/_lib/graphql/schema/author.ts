@@ -1,11 +1,13 @@
 import gql from "graphql-tag";
 
 const author = gql`
+  scalar DateTime
+
   type Author {
     id: Int!
     name: String!
     biography: String
-    born_date: String
+    born_date: DateTime
     image: String
   }
 
@@ -13,7 +15,7 @@ const author = gql`
     id: Int
     name: String!
     biography: String
-    born_date: String
+    born_date: DateTime
     image: String
   }
 
