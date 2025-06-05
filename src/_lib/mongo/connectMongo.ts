@@ -24,7 +24,7 @@ async function connectDB() {
 
     if (!DATABASE_URL) {
       throw new Error(
-        "Please define the DATABASE_URL environment variable inside .env.local"
+        "Please define the MONGO_URL environment variable inside .env.local"
       );
     }
 
