@@ -118,4 +118,24 @@ export const GET_AUTHOR_NAMES = gql`
   }
 `;
 
+export const UPDATE_AUTHOR = gql`
+  mutation UpdateAuthor($author: AuthorInput!) {
+    updateAuthor(author: $author) {
+      id
+      name
+      biography
+      born_date
+      image
+    }
+  }
+`;
+
+export const DELETE_AUTHOR = gql`
+  mutation DeleteAuthor($id: Int!) {
+    deleteAuthor(id: $id) {
+      id
+    }
+  }
+`;
+
 export default author;

@@ -1,17 +1,9 @@
 "use client";
 
-import { GET_AUTHORS } from "@/_lib/graphql/schema/author";
+import { GET_AUTHORS, UPDATE_AUTHOR } from "@/_lib/graphql/schema/author";
 import { Author } from "@/_lib/models/associations";
 import { Loader } from "@/_ui/components/Loader";
 import { Button } from "@/_ui/shadcn/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/_ui/shadcn/card";
 import {
   Dialog,
   DialogContent,
@@ -27,12 +19,11 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/_ui/shadcn/pagination";
-import { useQuery } from "@apollo/client";
-import { ImageIcon, PlusIcon } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useMutation, useQuery } from "@apollo/client";
+import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { AddAuthorForm } from "../BookList/AddAuthorForm";
+import AuthorCard from "./AuthorCard";
 import { AuthorFilters } from "./AuthorFilters";
 
 interface AuthorWithBooks extends Author {
@@ -44,49 +35,11 @@ interface AuthorWithBooks extends Author {
 
 const PAGE_SIZE = 8;
 
-const AuthorCard = ({ author }: { author: AuthorWithBooks }) => {
-  const router = useRouter();
-
-  return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="flex-grow">
-        <CardTitle className="line-clamp-2">{author.name}</CardTitle>
-      </CardHeader>
-      <div className="relative aspect-square w-full max-w-[200px] mx-auto overflow-hidden rounded-full border">
-        {author.image ? (
-          <Image
-            src={author.image}
-            alt={`${author.name}'s photo`}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-muted">
-            <ImageIcon className="h-12 w-12 text-muted-foreground" />
-          </div>
-        )}
-      </div>
-      <CardContent>
-        <CardDescription className="line-clamp-3">
-          {author.biography}
-        </CardDescription>
-        <div className="flex justify-between">
-          <p className="text-sm text-muted-foreground mt-2">
-            {author.books?.length || 0} Books
-          </p>
-        </div>
-      </CardContent>
-      <CardFooter className="mt-auto">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => router.push(`/authors/${author.id}`)}
-        >
-          View Details
-        </Button>
-      </CardFooter>
-    </Card>
-  );
+type AuthorFormValues = {
+  name: string;
+  biography?: string;
+  born_date?: string;
+  image?: string;
 };
 
 export default function AuthorsList() {
@@ -95,6 +48,8 @@ export default function AuthorsList() {
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editAuthor, setEditAuthor] = useState<AuthorWithBooks | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { loading, error, data, refetch } = useQuery(GET_AUTHORS, {
     variables: {
@@ -104,6 +59,10 @@ export default function AuthorsList() {
       sortBy,
       sortOrder,
     },
+  });
+
+  const [updateAuthor] = useMutation(UPDATE_AUTHOR, {
+    refetchQueries: [{ query: GET_AUTHORS }],
   });
 
   const handlePageChange = (newPage: number) => {
@@ -124,6 +83,28 @@ export default function AuthorsList() {
   const handleAuthorAdded = () => {
     setIsAddDialogOpen(false);
     refetch();
+  };
+
+  const handleEditAuthor = async (values: AuthorFormValues) => {
+    if (!editAuthor) return;
+    try {
+      setIsSubmitting(true);
+      await updateAuthor({
+        variables: {
+          author: {
+            ...values,
+            id: editAuthor.id,
+            born_date: values.born_date ? new Date(values.born_date) : null,
+          },
+        },
+      });
+      setEditAuthor(null);
+      refetch();
+    } catch (error) {
+      console.error("Error updating author:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (loading && !data) {
@@ -168,9 +149,39 @@ export default function AuthorsList() {
         />
       </div>
 
+      <Dialog
+        open={!!editAuthor}
+        onOpenChange={(open) => !open && setEditAuthor(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Author</DialogTitle>
+          </DialogHeader>
+          {editAuthor && (
+            <AddAuthorForm
+              onSubmit={handleEditAuthor}
+              isLoading={isSubmitting}
+              initialValues={{
+                name: editAuthor.name,
+                biography: editAuthor.biography || "",
+                born_date: editAuthor.born_date
+                  ? new Date(editAuthor.born_date).toISOString().slice(0, 10)
+                  : "",
+                image: editAuthor.image || "",
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {authors.map((author: AuthorWithBooks) => (
-          <AuthorCard key={author.id} author={author} />
+          <AuthorCard
+            key={author.id}
+            author={author}
+            onEdit={() => setEditAuthor(author)}
+            onDeleted={refetch}
+          />
         ))}
       </div>
 

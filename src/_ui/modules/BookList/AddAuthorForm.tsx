@@ -36,9 +36,14 @@ type FormValues = z.infer<typeof formSchema>;
 interface AddAuthorFormProps {
   onSubmit: (values: FormValues) => void;
   isLoading?: boolean;
+  initialValues?: Partial<FormValues>;
 }
 
-export function AddAuthorForm({ onSubmit, isLoading }: AddAuthorFormProps) {
+export function AddAuthorForm({
+  onSubmit,
+  isLoading,
+  initialValues,
+}: AddAuthorFormProps) {
   const [isImageUploading, setIsImageUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -51,6 +56,7 @@ export function AddAuthorForm({ onSubmit, isLoading }: AddAuthorFormProps) {
       biography: "",
       born_date: "",
       image: "",
+      ...initialValues,
     },
   });
 
@@ -182,8 +188,14 @@ export function AddAuthorForm({ onSubmit, isLoading }: AddAuthorFormProps) {
           {isLoading || isImageUploading || isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {isImageUploading ? "Uploading Image..." : "Adding..."}
+              {isImageUploading
+                ? "Uploading Image..."
+                : initialValues
+                ? "Saving..."
+                : "Adding..."}
             </>
+          ) : initialValues ? (
+            "Save Changes"
           ) : (
             "Add Author"
           )}
