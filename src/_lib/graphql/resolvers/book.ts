@@ -4,6 +4,7 @@ import connectDB from "@/_lib/mongo/connectMongo";
 import BookMongo from "@/_lib/mongo/models/Book";
 import { GraphQLScalarType, Kind, ValueNode } from "graphql";
 import { Op, WhereOptions } from "sequelize";
+import "../../models/associations";
 
 // Add DateTime scalar resolver
 const dateTimeScalar = new GraphQLScalarType({

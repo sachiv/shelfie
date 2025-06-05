@@ -1,6 +1,7 @@
 import Author from "@/_lib/models/Author";
 import Book from "@/_lib/models/Book";
 import { Op, WhereOptions } from "sequelize";
+import "../../models/associations";
 
 type AuthorInput = {
   id?: number;
