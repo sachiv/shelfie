@@ -6,7 +6,7 @@ Shelfie is your personal digital bookshelf - a modern web application that helps
 
 Let's get you set up and running. 🚀
 
-## 🎥 Demo
+## Demo 🎥
 
 - **Try it live**: [Shelfie App](https://shelfie-six.vercel.app/)
 
@@ -14,7 +14,7 @@ Let's get you set up and running. 🚀
 
 https://github.com/user-attachments/assets/8b9c7e20-3192-4129-a6cd-8625d9288de2
 
-## Prerequisites
+## Prerequisites ⚙️
 
 Before you begin, make sure you have:
 
@@ -24,7 +24,7 @@ Before you begin, make sure you have:
 - **pnpm** package manager
   - Don't have it? Follow the [pnpm installation guide](https://pnpm.io/installation)
 
-## Setup Instructions
+## Setup Instructions 🛠️
 
 1. **Clone the repository** (if you haven't already)
 
