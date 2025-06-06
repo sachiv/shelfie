@@ -10,7 +10,7 @@ Let's get you set up and running. 🚀
 
 Watch how Shelfie works:
 
-https://github.com/sachiv/shelfie/shelfie-assets/shelfie-demo.mov
+https://github.com/sachiv/shelfie/raw/refs/heads/main/shelfie-assets/shelfie-demo.mov
 
 ## Prerequisites
 
