@@ -6,9 +6,11 @@ Shelfie is your personal digital bookshelf - a modern web application that helps
 
 Let's get you set up and running. 🚀
 
-## 🎥 Demo Video
+## 🎥 Demo
 
-Watch how Shelfie works:
+- **Try it live**: [Shelfie App](https://shelfie-six.vercel.app/)
+
+- **Watch how Shelfie works:**
 
 https://github.com/user-attachments/assets/8b9c7e20-3192-4129-a6cd-8625d9288de2
 
