@@ -15,7 +15,8 @@
     "migration:seed:undo": "dotenv -- sequelize-cli db:seed:undo:all",
     "migration:reseed": "dotenv -- sequelize-cli db:drop && dotenv -- sequelize-cli db:create && dotenv -- sequelize-cli db:migrate && dotenv -- sequelize-cli db:seed:all",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",

@@ -64,6 +64,21 @@ Before you begin, make sure you have:
 
 Visit [http://localhost:3000](http://localhost:3000) in your browser to see your app running! 🎉
 
+## Testing 🧪
+
+Before deploying, make sure to run the test suite to ensure everything is working as expected:
+
+```bash
+# Run all tests
+pnpm run test
+
+# Run tests in watch mode during development
+pnpm run test:watch
+
+# Run tests with coverage report
+pnpm run test:coverage
+```
+
 ## Deploy 🚀
 
 Ready to deploy your own Shelfie app? We've got you covered with two easy options:
