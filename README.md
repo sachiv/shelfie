@@ -6,6 +6,12 @@ Shelfie is your personal digital bookshelf - a modern web application that helps
 
 Let's get you set up and running. 🚀
 
+## 🎥 Demo Video
+
+Watch how Shelfie works:
+
+https://github.com/sachiv/shelfie/shelfie-assets/shelfie-demo.mov
+
 ## Prerequisites
 
 Before you begin, make sure you have:
